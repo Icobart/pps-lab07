@@ -17,12 +17,7 @@ abstract class Parser[T]:
 
 object Parsers:
   extension (string: String)
-    def charParser(): Parser[Char] =
-      new Parser[Char] {
-        override def parse(t: Char): Boolean =
-          string.contains(t)
-        override def end: Boolean = true
-      }
+    def charParser(): Parser[Char] = new BasicParser(string.toSet)
 class BasicParser(chars: Set[Char]) extends Parser[Char]:
   override def parse(t: Char): Boolean = chars.contains(t)
   override def end: Boolean = true
@@ -39,21 +34,13 @@ class NonEmptyParser(chars: Set[Char])
     with NonEmpty[Char]
 
 trait NotTwoConsecutive[T] extends Parser[T]:
-  private[this] var previous: Option[T] = Option.empty
-  private[this] var consecutive = false
+  private[this] var previous: Option[T] = None
 
   abstract override def parse(t: T): Boolean = previous match
-    case None =>
-      previous = Some(t)
-      super.parse(t)
-    case _ if previous.get == t =>
-      consecutive = true
-      super.parse(t)
+    case Some(prev) if prev == t => false
     case _ =>
       previous = Some(t)
       super.parse(t)
-
-  abstract override def end: Boolean = (previous.isEmpty || !consecutive) && super.end
 
 class NotTwoConsecutiveParser(chars: Set[Char])
     extends BasicParser(chars)
@@ -87,6 +74,7 @@ trait ShortenThenN[T](n: Int) extends Parser[T]:
   println(parserNTC.parseAll("".toList)) // true
 
   // note we do not need a class name here, we use the structural type
+  // Linearization: NonEmpty[Char] -> NotTwoConsecutive[Char] -> BasicParser -> Parser[Char]
   def parserNTCNE = new BasicParser(Set('X', 'Y', 'Z'))
     with NotTwoConsecutive[Char]
     with NonEmpty[Char]
