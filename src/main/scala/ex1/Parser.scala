@@ -59,6 +59,14 @@ class NotTwoConsecutiveParser(chars: Set[Char])
     extends BasicParser(chars)
     with NotTwoConsecutive[Char]
 
+trait ShortenThenN[T](n: Int) extends Parser[T]:
+  private[this] var size = 0
+  abstract override def parse(t: T): Boolean = size match
+    case _ if size >= n => false
+    case _ =>
+      size += 1
+      super.parse(t)
+
 @main def checkParsers(): Unit =
   def parser = new BasicParser(Set('a', 'b', 'c'))
   println(parser.parseAll("aabc".toList)) // true
