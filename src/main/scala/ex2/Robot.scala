@@ -61,6 +61,11 @@ class RobotCanFail(val robot: Robot, val failChance: Double) extends Robot:
   override def act(): Unit =
     if random.nextDouble() > failChance then robot.act() else println("robot failed")
 
+class RobotRepeated(val robot: Robot, val repetitions: Int) extends Robot:
+  export robot.{act as _, *}
+  override def act(): Unit =
+    for i <- 0 until repetitions do
+      robot.act()
 
 @main def testRobot(): Unit =
   val initialPosition = (0, 0)
@@ -75,10 +80,10 @@ class RobotCanFail(val robot: Robot, val failChance: Double) extends Robot:
   var previousPosition = initialPosition
   robotCanFail.act()
   @tailrec
-  def runRobotCanFail: Unit = robotCanFail.position match
+  def runRobotCanFail(): Unit = robotCanFail.position match
     case p if p == previousPosition => println("Robot ended in: "+ p)
     case p =>
       previousPosition = p
       robotCanFail.act()
-      runRobotCanFail
-  runRobotCanFail
+      runRobotCanFail()
+  runRobotCanFail()
