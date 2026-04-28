@@ -45,10 +45,8 @@ class LoggingRobot(val robot: Robot) extends Robot:
     robot.act()
     println(robot.toString)
 
-class RobotWithBattery(val robot: Robot) extends Robot:
+class RobotWithBattery(val robot: Robot, var battery: Int, val cost: Int) extends Robot:
   export robot.{act as _, *}
-  private var battery = 100
-  private val cost = 20
   override def act(): Unit = battery match
     case b if b >= cost =>
       battery -= cost

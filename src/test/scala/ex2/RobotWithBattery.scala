@@ -6,7 +6,9 @@ import org.scalatest.matchers.should.Matchers
 class RobotWithBatterySpec extends AnyFlatSpec with Matchers:
   "A RobotWithBattery" should "act correctly if charged" in:
     val initialPosition = (0, 0)
-    val robot = new RobotWithBattery(new SimpleRobot(initialPosition, Direction.North))
+    val battery = 100
+    val cost = 20
+    val robot = new RobotWithBattery(new SimpleRobot(initialPosition, Direction.North), battery, cost)
     robot.act()
     robot.position should be((0, 1))
     robot.act()
@@ -19,7 +21,9 @@ class RobotWithBatterySpec extends AnyFlatSpec with Matchers:
 
   it should "stop if there isn't enough charge" in:
     val initialPosition = (0, 0)
-    val robot = new RobotWithBattery(new SimpleRobot(initialPosition, Direction.North))
+    val battery = 100
+    val cost = 20
+    val robot = new RobotWithBattery(new SimpleRobot(initialPosition, Direction.North), battery, cost)
     robot.act()
     robot.position should be((0, 1))
     robot.act()
