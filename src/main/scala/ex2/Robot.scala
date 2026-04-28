@@ -1,5 +1,8 @@
 package ex2
 
+import scala.annotation.tailrec
+import scala.util.Random
+
 type Position = (Int, Int)
 enum Direction:
   case North, East, South, West
@@ -52,9 +55,30 @@ class RobotWithBattery(val robot: Robot) extends Robot:
       robot.act()
     case _ => println("battery exhausted, current level: "+ battery)
 
+class RobotCanFail(val robot: Robot, val failChance: Double) extends Robot:
+  export robot.{act as _, *}
+  private val random = new Random()
+  override def act(): Unit =
+    if random.nextDouble() > failChance then robot.act() else println("robot failed")
+
+
 @main def testRobot(): Unit =
-  val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
+  val initialPosition = (0, 0)
+  val robot = LoggingRobot(SimpleRobot(initialPosition, Direction.North))
   robot.act() // robot at (0, 1) facing North
   robot.turn(robot.direction.turnRight) // robot at (0, 1) facing East
   robot.act() // robot at (1, 1) facing East
   robot.act() // robot at (2, 1) facing East
+  println("\nRobotCanFail running...")
+  val probability = 0.3
+  val robotCanFail = RobotCanFail(SimpleRobot(initialPosition, Direction.North), probability)
+  var previousPosition = initialPosition
+  robotCanFail.act()
+  @tailrec
+  def runRobotCanFail: Unit = robotCanFail.position match
+    case p if p == previousPosition => println("Robot ended in: "+ p)
+    case p =>
+      previousPosition = p
+      robotCanFail.act()
+      runRobotCanFail
+  runRobotCanFail
