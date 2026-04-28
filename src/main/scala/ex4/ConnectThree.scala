@@ -27,9 +27,11 @@ object ConnectThree extends App:
 
   import Player.*
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = ???
+  def find(board: Board, x: Int, y: Int): Option[Player] =
+    board.find(p => p.x == x && p.y == y).map(_.player)
 
-  def firstAvailableRow(board: Board, x: Int): Option[Int] = ???
+  def firstAvailableRow(board: Board, x: Int): Option[Int] =
+    Some(board.count(_.x == x)).filter(_ <= bound)
 
   def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
 
